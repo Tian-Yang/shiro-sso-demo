@@ -1,9 +1,7 @@
 package com.shiro.demo.principal;
 
-import com.shiro.demo.constans.JwtTokenConstant;
+import com.shiro.demo.constants.JwtTokenConstant;
 import org.apache.shiro.subject.SimplePrincipalMap;
-import org.apache.shiro.util.CollectionUtils;
-import org.apache.shiro.util.StringUtils;
 
 public class JwtPrincipalMap extends SimplePrincipalMap {
     private static final long serialVersionUID = 2461873285984188888L;

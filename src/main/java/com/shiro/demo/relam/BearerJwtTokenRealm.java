@@ -1,6 +1,6 @@
 package com.shiro.demo.relam;
 
-import com.shiro.demo.constans.JwtTokenConstant;
+import com.shiro.demo.constants.JwtTokenConstant;
 import com.shiro.demo.principal.JwtPrincipalMap;
 import com.shiro.demo.token.BearerJwtToken;
 import com.shiro.demo.util.JwtUtil;

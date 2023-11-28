@@ -5,6 +5,8 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.shiro.demo.bean.MemberInfo;
+import com.shiro.demo.jwt.AbstractJwtTokenPayload;
+import com.shiro.demo.jwt.CsrfJwtTokenPayload;
 import com.shiro.demo.jwt.JwtTokenPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.util.Assert;
@@ -53,7 +55,7 @@ public class JwtUtil {
      * @Author TianYang
      * @Date 2023/11/15 14:17
      */
-    public static String createJwtToken(JwtTokenPayload jwtTokenPayload) {
+    public static String createJwtToken(AbstractJwtTokenPayload jwtTokenPayload) {
         Assert.notNull(jwtTokenPayload, "JwtUtil Jwt Token Payload can not be null");
         Assert.notNull(rsaPublicKey, "JwtUtil rsaPublicKey cant not be null");
         Assert.notNull(rsaPrivateKey, "JwtUtil rsaPrivateKey cant not be null");
@@ -69,7 +71,6 @@ public class JwtUtil {
         return jwtToken;
     }
 
-
     /**
      * JwtToken解析
      *
@@ -78,7 +79,7 @@ public class JwtUtil {
      * @Author TianYang
      * @Date 2023/11/15 14:16
      */
-    public static JwtTokenPayload decodeJwtToken(String token)  {
+    public static <T extends AbstractJwtTokenPayload> T decodeJwtToken(String token,Class<T> type) {
         Assert.notNull(token, "JwtUtil token can not be null");
         Assert.notNull(rsaPublicKey, "JwtUtil rsaPublicKey cant not be null");
 
@@ -87,9 +88,8 @@ public class JwtUtil {
                 .build()
                 .verify(decodedJWT);
         String payloadJson = new String(Base64.getDecoder().decode(jwt.getPayload().getBytes()));
-        return JSON.parseObject(payloadJson, JwtTokenPayload.class);
+        return JSON.parseObject(payloadJson, type);
     }
-
     /**
      * 获取Token失效时间
      *
@@ -100,6 +100,19 @@ public class JwtUtil {
      */
     public static Long getExpirationTimeMillis(int days) {
         long expirationTimeMillis = System.currentTimeMillis() + 60 * days * 1000;
+        return expirationTimeMillis;
+    }
+
+    /**
+     * 获取Token失效时间
+     *
+     * @param seconds
+     * @return java.lang.Long
+     * @Author TianYang
+     * @Date 2023/11/24 15:06
+     */
+    public static Long getExpirationTimeMillisOfSeconds(int seconds) {
+        long expirationTimeMillis = System.currentTimeMillis() + 60 * seconds * 1000;
         return expirationTimeMillis;
     }
 
@@ -130,7 +143,7 @@ public class JwtUtil {
         try {
             String jwtToken = createJwtToken(jwtTokenPayload);
             log.info("jwtToken:{}", jwtToken);
-            JwtTokenPayload jwtTokenPayload1 = decodeJwtToken(jwtToken);
+            JwtTokenPayload jwtTokenPayload1 = decodeJwtToken(jwtToken,JwtTokenPayload.class);
             log.info("decodeJwtToken:{}", jwtTokenPayload1);
         } catch (Exception e) {
             throw new RuntimeException(e);

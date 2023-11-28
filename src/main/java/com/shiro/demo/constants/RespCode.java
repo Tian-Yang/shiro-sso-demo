@@ -1,4 +1,4 @@
-package com.shiro.demo.constans;
+package com.shiro.demo.constants;
 
 public interface RespCode {
 

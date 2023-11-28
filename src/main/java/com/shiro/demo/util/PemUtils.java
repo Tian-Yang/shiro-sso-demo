@@ -1,5 +1,7 @@
 package com.shiro.demo.util;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authc.AuthenticationException;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 
@@ -16,6 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+@Slf4j
 public class PemUtils {
 
     private static byte[] parsePEMFile(File pemFile) throws IOException {
@@ -30,30 +33,34 @@ public class PemUtils {
     }
 
     private static PublicKey getPublicKey(byte[] keyBytes, String algorithm) {
-        PublicKey publicKey = null;
+        PublicKey publicKey;
         try {
             KeyFactory kf = KeyFactory.getInstance(algorithm);
             EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
             publicKey = kf.generatePublic(keySpec);
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("Could not reconstruct the public key, the given algorithm could not be found.");
+            log.error("Could not reconstruct the public key, the given algorithm could not be found.", e);
+            throw new AuthenticationException("Could not reconstruct the public key, the given algorithm could not be found.", e);
         } catch (InvalidKeySpecException e) {
-            System.out.println("Could not reconstruct the public key");
+            log.error("Could not reconstruct the public key", e);
+            throw new AuthenticationException("Could not reconstruct the public key", e);
         }
 
         return publicKey;
     }
 
     private static PrivateKey getPrivateKey(byte[] keyBytes, String algorithm) {
-        PrivateKey privateKey = null;
+        PrivateKey privateKey;
         try {
             KeyFactory kf = KeyFactory.getInstance(algorithm);
             EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
             privateKey = kf.generatePrivate(keySpec);
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("Could not reconstruct the private key, the given algorithm could not be found.");
+            log.error("Could not reconstruct the private key, the given algorithm could not be found.", e);
+            throw new AuthenticationException("Could not reconstruct the private key, the given algorithm could not be found.", e);
         } catch (InvalidKeySpecException e) {
-            System.out.println("Could not reconstruct the private key");
+            log.error("Could not reconstruct the private key", e);
+            throw new AuthenticationException("Could not reconstruct the private key", e);
         }
 
         return privateKey;

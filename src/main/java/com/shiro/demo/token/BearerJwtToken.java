@@ -35,7 +35,7 @@ public class BearerJwtToken implements HostAuthenticationToken, RememberMeAuthen
     @Override
     public Object getPrincipal() {
         //解析Token，从中获取用户唯一标识
-        JwtTokenPayload jwtTokenPayload = JwtUtil.decodeJwtToken(token);
+        JwtTokenPayload jwtTokenPayload = JwtUtil.decodeJwtToken(token,JwtTokenPayload.class);
         return jwtTokenPayload.getSub();
     }
 

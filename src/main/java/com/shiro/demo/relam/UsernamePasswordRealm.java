@@ -1,20 +1,12 @@
 package com.shiro.demo.relam;
 
 import com.shiro.demo.bean.MemberInfo;
-import com.shiro.demo.constans.JwtTokenConstant;
-import com.shiro.demo.jwt.JwtToken;
+import com.shiro.demo.constants.JwtTokenConstant;
 import com.shiro.demo.jwt.JwtTokenPayload;
 import com.shiro.demo.principal.JwtPrincipalMap;
-import com.shiro.demo.token.BasicToken;
 import com.shiro.demo.token.UsernamePasswordBCryptToken;
 import com.shiro.demo.util.JwtUtil;
 import org.apache.shiro.authc.*;
-import org.apache.shiro.authc.credential.DefaultPasswordService;
-import org.apache.shiro.authc.credential.PasswordService;
-import org.apache.shiro.authz.AuthorizationInfo;
-import org.apache.shiro.realm.AuthorizingRealm;
-import org.apache.shiro.subject.PrincipalCollection;
-import org.apache.shiro.subject.SimplePrincipalMap;
 import org.mindrot.jbcrypt.BCrypt;
 
 

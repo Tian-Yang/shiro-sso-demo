@@ -1,12 +1,12 @@
 package com.shiro.demo.bean;
 
-import com.shiro.demo.constans.RespCode;
+import com.shiro.demo.constants.RespCode;
 import lombok.Data;
 
 import java.io.Serializable;
 
 @Data
-public class CommonResp implements Serializable {
+public class CommonResp<T> implements Serializable {
 
     private static final long serialVersionUID = -8587276359818398428L;
 
@@ -16,7 +16,7 @@ public class CommonResp implements Serializable {
      */
     public static final String CODE_401 = "401";
 
-    private Object body;
+    private T body;
 
     private String code;
     private String errorMsg;
@@ -25,7 +25,7 @@ public class CommonResp implements Serializable {
         this.code = code;
     }
 
-    public CommonResp(String code, Object body) {
+    public CommonResp(String code, T body) {
         this.code = code;
         this.body = body;
     }

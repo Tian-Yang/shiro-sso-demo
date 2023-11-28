@@ -2,7 +2,7 @@ package com.shiro.demo.exception;
 
 import com.shiro.demo.bean.CommonResp;
 import com.shiro.demo.config.DeserializerException;
-import com.shiro.demo.constans.RespCode;
+import com.shiro.demo.constants.RespCode;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
