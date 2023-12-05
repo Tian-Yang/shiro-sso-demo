@@ -5,9 +5,13 @@ import com.shiro.demo.constants.JwtTokenConstant;
 import com.shiro.demo.jwt.JwtTokenPayload;
 import com.shiro.demo.principal.JwtPrincipalMap;
 import com.shiro.demo.token.UsernamePasswordBCryptToken;
+import com.shiro.demo.util.HAMCUtil;
 import com.shiro.demo.util.JwtUtil;
 import org.apache.shiro.authc.*;
 import org.mindrot.jbcrypt.BCrypt;
+
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 
 /**
@@ -24,9 +28,12 @@ public class UsernamePasswordRealm extends CustomizeAbstractRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
+
         UsernamePasswordBCryptToken usernamePasswordToken = (UsernamePasswordBCryptToken) authenticationToken;
         String userName = usernamePasswordToken.getUsername();
-        //TODO 根据userName从数据库回去对应的凭证
+        //TODO 判断是否为Saas平台超管
+        //TODO 租户识别(根据Host中三级域识别)
+        //TODO 根据userName+租户ID从数据库回去对应的凭证
         //生成凭据
         String salt = BCrypt.gensalt(12);
         String password = BCrypt.hashpw("666", salt);
@@ -51,5 +58,18 @@ public class UsernamePasswordRealm extends CustomizeAbstractRealm {
         //设置用户、授权信息
         simpleAuthenticationInfo.setPrincipals(jwtPrincipalMap);
         return simpleAuthenticationInfo;
+    }
+
+    public static void main(String[] args) {
+        String salt = BCrypt.gensalt(10);
+        String password = BCrypt.hashpw("666", salt);
+        System.out.println(password);
+        try {
+            System.out.println(HAMCUtil.signature("123","456", HAMCUtil.Algorithms.HmacMD5));
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -10,12 +10,8 @@ import com.shiro.demo.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.subject
-        .PrincipalCollection;
 import org.apache.shiro.subject.Subject;
-import org.apache.shiro.util.CollectionUtils;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,19 +19,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Controller
-public class ShiroController {
-
-    @RequestMapping("/regist")
-    @ResponseBody
-    public String regist() {
-        return null;
-    }
+public class AuthController {
 
 
     //@RequiresRoles("admin")
@@ -48,6 +35,7 @@ public class ShiroController {
         log.info("is login:{}", subject.isAuthenticated());
         return "hello shiro";
     }
+
 
     @RequiresPermissions("account:create")
     @RequestMapping("/checkPermission")
@@ -66,7 +54,7 @@ public class ShiroController {
 
     @PostMapping("/auth")
     @ResponseBody
-    public CommonResp auth(HttpServletResponse httpServletResponse,@RequestBody AuthReqDto authReqDto) {
+    public CommonResp auth(HttpServletResponse httpServletResponse, @RequestBody AuthReqDto authReqDto) {
         Subject subject = SecurityUtils.getSubject();
         JwtPrincipalMap jwtPrincipalMap = (JwtPrincipalMap) subject.getPrincipals();
         CsrfJwtTokenPayload csrfJwtTokenPayload = new CsrfJwtTokenPayload();
@@ -80,36 +68,12 @@ public class ShiroController {
         return CommonResp.success(jwtPrincipalMap);
     }
 
-    @RequestMapping("/toLogin")
-    public String toLogin() {
-        return "login";
-    }
 
-    @SuppressWarnings("Duplicates")
-    @RequestMapping("/")
-    public String home(HttpServletRequest request, Model model) {
 
-        String name = "World";
-
-        Subject subject = SecurityUtils.getSubject();
-
-        PrincipalCollection principalCollection = subject.getPrincipals();
-
-        if (principalCollection != null && !principalCollection.isEmpty()) {
-            Collection<Map> principalMaps = subject.getPrincipals().byType(Map.class);
-            if (CollectionUtils.isEmpty(principalMaps)) {
-                name = subject.getPrincipal().toString();
-            } else {
-                name = (String) principalMaps.iterator().next().get("username");
-            }
-        }
-        model.addAttribute("name", name);
-        return "hello";
-    }
 
     @PostMapping("/login")
     @ResponseBody
-    public String login(HttpServletRequest request) {
+    public CommonResp<String> login(HttpServletRequest request) {
         String userName = request.getParameter("username");
         Subject currentUser = SecurityUtils.getSubject();
         boolean isAuthenticated = currentUser.isAuthenticated();
@@ -119,23 +83,15 @@ public class ShiroController {
             token = jwtPrincipalMap.getJwtToken();
         }
         log.info("userName:{},password:{}", userName);
-        return token;
-    }
-
-    @RequestMapping("/unauthorized")
-    public Map<String, String> unauthorized(HttpServletRequest request) {
-        Map<String, String> rstMap = new HashMap<>();
-        rstMap.put("code", "9999");
-        rstMap.put("msg", "unauthorized");
-        return rstMap;
+        return CommonResp.success(token);
     }
 
     @PostMapping("/loginOut")
     @ResponseBody
-    public String loginOut() {
+    public CommonResp<Void> loginOut() {
         Subject currentUser = SecurityUtils.getSubject();
         currentUser.logout();
-        return "success";
+        return CommonResp.success();
     }
 
 

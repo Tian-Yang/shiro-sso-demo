@@ -73,9 +73,9 @@ public class ShiroConfig {
         //设置cacheManager
         jwtRealm.setCacheManager(authRedisCacheManager);
         //设置认证缓存
-        jwtRealm.setAuthenticationCache(authRedisCacheManager.getCache("sharedAuthenticationCache"));
+        jwtRealm.setAuthenticationCache(authRedisCacheManager.getCache("sso"));
         //设置授权缓存
-        jwtRealm.setAuthorizationCache(authRedisCacheManager.getCache("sharedAuthorizationCache"));
+        jwtRealm.setAuthorizationCache(authRedisCacheManager.getCache("sso"));
         //设置自定义凭证验证
         jwtRealm.setCredentialsMatcher(new PasswordBCryptCredentialsMatcher());
         return jwtRealm;
