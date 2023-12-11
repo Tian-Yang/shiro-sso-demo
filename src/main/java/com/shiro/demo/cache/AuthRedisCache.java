@@ -3,11 +3,16 @@ package com.shiro.demo.cache;
 import com.alibaba.fastjson.JSON;
 import com.shiro.demo.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.util.SerializationUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 /**
  * 自定义Redis缓存
@@ -18,14 +23,12 @@ import java.util.*;
 @Slf4j
 public class AuthRedisCache<K, V> implements Cache<K, V> {
 
-    private String cacheName;
     private String cacheNameKey;
     private RedisService redisService;
 
 
     public AuthRedisCache(RedisService redisService, String cacheName) {
         log.info("AuthRedisCache new(),cacheName:{}", cacheName);
-        this.cacheName = cacheName;
         this.cacheNameKey = cacheName;
         this.redisService = redisService;
     }
@@ -49,18 +52,18 @@ public class AuthRedisCache<K, V> implements Cache<K, V> {
     @Override
     public V put(K k, V v) throws CacheException {
         log.info("AuthRedisCache put,k:{},v:{}", k, v);
-        byte[] valueBytes = SerializationUtils.serialize(v);
-        redisService.hashSet(cacheNameKey, Base64.getEncoder().encodeToString(k.toString().getBytes()), valueBytes);
+        String key = (String) k;
+        redisService.saveObjectToRedis(cacheNameKey + "_" + key, v);
         return v;
     }
 
     @Override
-    public V remove(Object k) throws CacheException {
+    public V remove(K k) throws CacheException {
         log.info("AuthRedisCache remove,k:{}", k);
         V authenticationInfo = getAuthenticationInfoFromRedis(k);
-        String key = Base64.getEncoder().encodeToString(k.toString().getBytes());
+        String key = (String) k;
         if (null != authenticationInfo) {
-            redisService.hashDel(cacheNameKey, key);
+            redisService.del(cacheNameKey + "_" + key);
         }
         return authenticationInfo;
     }
@@ -68,38 +71,43 @@ public class AuthRedisCache<K, V> implements Cache<K, V> {
     @Override
     public void clear() throws CacheException {
         log.info("AuthRedisCache clear");
-        redisService.hashClear(cacheNameKey);
+        //redisService.hashClear(cacheNameKey);
     }
 
+    /**
+     * 无需扩展（Shiro默认的缓存是基于Map的，所以会存在这个方法。而扩展成redis后无需扩展这个方法）。
+     *
+     * @return int
+     * @Author TianYang
+     * @Date 2023/12/10 23:24
+     */
     @Override
     public int size() {
-        return redisService.hashHlen(cacheNameKey).intValue();
+        return 0;
     }
 
+    /**
+     * 无扩扩展
+     *
+     * @return java.util.Set<K>
+     * @Author TianYang
+     * @Date 2023/12/10 23:25
+     */
     @Override
     public Set<K> keys() {
-        return (Set<K>) redisService.hashKeys(cacheNameKey);
+        return null;
     }
 
     @Override
     public Collection<V> values() {
-        List<Object> valueList = redisService.hashValues(cacheNameKey);
-        List<V> authenticationInfoList = new ArrayList<>();
-        for (Object ob : valueList) {
-            byte[] valueBytes = (byte[]) ob;
-            V authenticationInfo = (V) SerializationUtils.deserialize(valueBytes);
-            authenticationInfoList.add(authenticationInfo);
-        }
-        return authenticationInfoList;
+        return null;
     }
 
-    private V getAuthenticationInfoFromRedis(Object k) {
+
+    private V getAuthenticationInfoFromRedis(K k) {
         V authenticationInfo = null;
-        String key = Base64.getEncoder().encodeToString(k.toString().getBytes());
-        if (redisService.hashHasKey(cacheNameKey, key)) {
-            byte[] valueBytes = (byte[]) redisService.hashGet(cacheNameKey, key);
-            authenticationInfo = (V) SerializationUtils.deserialize(valueBytes);
-        }
+        String key = (String) k;
+        authenticationInfo = (V) redisService.getObjectFromRedis(cacheNameKey + "_" + key);
         return authenticationInfo;
     }
 }

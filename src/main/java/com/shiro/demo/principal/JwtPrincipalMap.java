@@ -17,7 +17,7 @@ public class JwtPrincipalMap extends SimplePrincipalMap {
 
 
     /**
-     * 重写getPrimaryPrincipal方法，获取认证主体唯一标识，例如：用户名
+     * 重写getPrimaryPrincipal方法，获取认证主体唯一标识，例如：memberId
      *
      * @return java.lang.Object
      * @Author TianYang

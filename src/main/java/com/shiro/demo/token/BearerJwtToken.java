@@ -1,5 +1,7 @@
 package com.shiro.demo.token;
 
+import com.shiro.demo.bean.MemberInfo;
+import com.shiro.demo.entity.MemberInfoEntity;
 import com.shiro.demo.jwt.JwtTokenPayload;
 import com.shiro.demo.util.JwtUtil;
 import org.apache.shiro.authc.HostAuthenticationToken;
@@ -14,11 +16,14 @@ import org.apache.shiro.authc.RememberMeAuthenticationToken;
  */
 public class BearerJwtToken implements HostAuthenticationToken, RememberMeAuthenticationToken {
     private String host;
+
+    private String clientHost;
     private String token;
 
-    public BearerJwtToken(final String token, final String host) {
+    public BearerJwtToken(final String token, final String host, final String clientHost) {
         this.host = host;
         this.token = token;
+        this.clientHost = clientHost;
     }
 
 
@@ -33,10 +38,18 @@ public class BearerJwtToken implements HostAuthenticationToken, RememberMeAuthen
     }
 
     @Override
-    public Object getPrincipal() {
+    public String getPrincipal() {
         //解析Token，从中获取用户唯一标识
-        JwtTokenPayload jwtTokenPayload = JwtUtil.decodeJwtToken(token,JwtTokenPayload.class);
-        return jwtTokenPayload.getSub();
+        JwtTokenPayload jwtTokenPayload = JwtUtil.decodeJwtToken(token, JwtTokenPayload.class);
+        MemberInfo memberInfo = jwtTokenPayload.getMemberInfo();
+        Long memberId = memberInfo.getMemberId();
+        Long tenantId = memberInfo.getTenantId();
+        String bussinessDomainCode = memberInfo.getBusinessDomainCode();
+        String key = bussinessDomainCode + "_" + memberId;
+        if (null != tenantId) {
+            key = key + "_" + token;
+        }
+        return key;
     }
 
     @Override

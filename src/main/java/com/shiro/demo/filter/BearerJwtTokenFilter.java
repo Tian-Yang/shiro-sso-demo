@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Jwt Token处理过滤器
@@ -36,7 +37,7 @@ public class BearerJwtTokenFilter extends BearerHttpAuthenticationFilter {
     @Resource
     HandlerMappingContext handlerMappingContext;
 
-    private Map<String, Boolean> requestAuthMap = new HashMap<>();
+    private Map<String, Boolean> requestAuthMap = new ConcurrentHashMap<>();
 
     /**
      * 重写createBearerToken方法
@@ -46,7 +47,9 @@ public class BearerJwtTokenFilter extends BearerHttpAuthenticationFilter {
      * @return
      */
     protected AuthenticationToken createBearerToken(String token, ServletRequest request) {
-        return new BearerJwtToken(token, request.getRemoteHost());
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        String clientHost = httpServletRequest.getHeader("X-Forwarded-Host");
+        return new BearerJwtToken(token, httpServletRequest.getRemoteHost(),clientHost);
     }
 
 

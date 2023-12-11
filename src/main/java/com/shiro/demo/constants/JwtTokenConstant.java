@@ -6,6 +6,8 @@ public interface JwtTokenConstant {
      */
     String TOKEN_EXPIRED_TIME = "tokenExpiredTime";
 
+    String MEMBER_INFO ="member_info";
+
     /**
      * Token有效天数
      */

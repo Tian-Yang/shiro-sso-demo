@@ -1,5 +1,6 @@
 package com.shiro.demo.relam;
 
+import com.shiro.demo.bean.MemberInfo;
 import com.shiro.demo.constants.JwtTokenConstant;
 import com.shiro.demo.principal.JwtPrincipalMap;
 import com.shiro.demo.token.BearerJwtToken;
@@ -82,21 +83,7 @@ public class BearerJwtTokenRealm extends CustomizeAbstractRealm {
 
     @Override
     protected void clearCachedAuthenticationInfo(PrincipalCollection principals) {
-        if (null != principals && !principals.isEmpty()) {
-            Cache<Object, AuthenticationInfo> cache = this.getAuthenticationCache();
-            //cache instance will be non-null if caching is enabled:
-            if (cache != null) {
-                if (principals instanceof JwtPrincipalMap) {
-                    JwtPrincipalMap jwtPrincipalMap = (JwtPrincipalMap) principals;
-                    Object key = jwtPrincipalMap.getPrimaryPrincipal();
-                    cache.remove(key);
-                } else {
-                    throw new AuthenticationException("principals is mismatch");
-                }
-
-
-            }
-        }
+       super.clearCachedAuthenticationInfo(principals);
     }
 
 
@@ -110,21 +97,12 @@ public class BearerJwtTokenRealm extends CustomizeAbstractRealm {
      */
     @Override
     protected void clearCachedAuthorizationInfo(PrincipalCollection principals) {
-        if (principals == null) {
-            return;
-        }
-
-        Cache<Object, AuthenticationInfo> cache = this.getAuthenticationCache();
-        //cache instance will be non-null if caching is enabled:
-        if (cache != null) {
-            Object key = getAuthorizationCacheKey(principals);
-            cache.remove(key);
-        }
+        super.clearCachedAuthorizationInfo(principals);
     }
 
 
     /**
-     * 重写授权缓存key获取方法，实现自电影一缓存key
+     * 重写授权缓存key获取方法，实现自定义一缓存key
      *
      * @param principals
      * @return java.lang.Object
@@ -134,8 +112,8 @@ public class BearerJwtTokenRealm extends CustomizeAbstractRealm {
     @Override
     protected Object getAuthorizationCacheKey(PrincipalCollection principals) {
         JwtPrincipalMap jwtPrincipalMap = (JwtPrincipalMap) principals;
-        String primaryPrincipal = (String) jwtPrincipalMap.getPrimaryPrincipal();
-        String key = primaryPrincipal + "_authorization";
+        MemberInfo memberInfo= jwtPrincipalMap.oneByType(MemberInfo.class);
+        String key = memberInfo.getMemberAuthCacheKey() + "_authorization";
         return key;
     }
 

@@ -3,6 +3,7 @@ package com.shiro.demo.config;
 import com.shiro.demo.authenticat.BearerTokenCredentialsMatcher;
 import com.shiro.demo.authenticat.PasswordBCryptCredentialsMatcher;
 import com.shiro.demo.cache.AuthRedisCacheManager;
+import com.shiro.demo.constants.RedisKeyConstant;
 import com.shiro.demo.filter.BasicUsernamePasswordLoginFilter;
 import com.shiro.demo.filter.BearerJwtTokenFilter;
 import com.shiro.demo.relam.BearerJwtTokenRealm;
@@ -50,6 +51,8 @@ import java.util.Map;
         ShiroRequestMappingConfig.class})
 public class ShiroConfig {
 
+
+
     @Bean
     public AuthRedisCacheManager authRedisCacheManager(@Qualifier("redisService") RedisService redisService) {
         AuthRedisCacheManager authRedisCacheManager = new AuthRedisCacheManager(redisService);
@@ -73,9 +76,9 @@ public class ShiroConfig {
         //设置cacheManager
         jwtRealm.setCacheManager(authRedisCacheManager);
         //设置认证缓存
-        jwtRealm.setAuthenticationCache(authRedisCacheManager.getCache("sso"));
+        jwtRealm.setAuthenticationCache(authRedisCacheManager.getCache(RedisKeyConstant.AUTHENTICATION_CACHE_KEY));
         //设置授权缓存
-        jwtRealm.setAuthorizationCache(authRedisCacheManager.getCache("sso"));
+        jwtRealm.setAuthorizationCache(authRedisCacheManager.getCache(RedisKeyConstant.AUTHENTICATION_CACHE_KEY));
         //设置自定义凭证验证
         jwtRealm.setCredentialsMatcher(new PasswordBCryptCredentialsMatcher());
         return jwtRealm;
@@ -98,9 +101,9 @@ public class ShiroConfig {
         bearerJwtTokenRealm.setAuthorizationCachingEnabled(true);
         bearerJwtTokenRealm.setCacheManager(authRedisCacheManager);
         //设置认证缓存
-        bearerJwtTokenRealm.setAuthenticationCache(authRedisCacheManager.getCache("sharedAuthenticationCache"));
+        bearerJwtTokenRealm.setAuthenticationCache(authRedisCacheManager.getCache(RedisKeyConstant.AUTHENTICATION_CACHE_KEY));
         //设置授权缓存
-        bearerJwtTokenRealm.setAuthorizationCache(authRedisCacheManager.getCache("sharedAuthorizationCache"));
+        bearerJwtTokenRealm.setAuthorizationCache(authRedisCacheManager.getCache(RedisKeyConstant.AUTHENTICATION_CACHE_KEY));
         return bearerJwtTokenRealm;
     }
 
@@ -212,14 +215,14 @@ public class ShiroConfig {
      */
     @Bean
     @Primary
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultSecurityManager securityManager, ShiroFilterChainDefinition shiroFilterChainDefinition, @Qualifier("bearerJwtTokenFilter") BearerJwtTokenFilter bearerJwtTokenFilter) {
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(DefaultSecurityManager securityManager, ShiroFilterChainDefinition shiroFilterChainDefinition, @Qualifier("bearerJwtTokenFilter") BearerJwtTokenFilter bearerJwtTokenFilter, @Qualifier("basicUsernamePasswordLoginFilter") BasicUsernamePasswordLoginFilter basicUsernamePasswordLoginFilter) {
         ShiroFilterFactoryBean shiroFilterFactoryBean = new ShiroFilterFactoryBean();
         shiroFilterFactoryBean.setSecurityManager(securityManager);
         Map<String, Filter> filters = new HashMap<>();
         //自定义Http Authorization:Bearer <token> 过滤器
         filters.put("authcBearer", bearerJwtTokenFilter);
         //自定义Http Authorization:Basic <Base64(userName:password)> 过滤器
-        filters.put("authcBasic", new BasicUsernamePasswordLoginFilter());
+        filters.put("authcBasic", basicUsernamePasswordLoginFilter);
         shiroFilterFactoryBean.setFilters(filters);
         shiroFilterFactoryBean.setFilterChainDefinitionMap(shiroFilterChainDefinition.getFilterChainMap());
         return shiroFilterFactoryBean;
@@ -230,6 +233,12 @@ public class ShiroConfig {
     @Primary
     public BearerJwtTokenFilter bearerJwtTokenFilter() {
         return new BearerJwtTokenFilter();
+    }
+
+    @Bean
+    @Primary
+    public BasicUsernamePasswordLoginFilter basicUsernamePasswordLoginFilter() {
+        return new BasicUsernamePasswordLoginFilter();
     }
 
     @ModelAttribute(name = "subject")

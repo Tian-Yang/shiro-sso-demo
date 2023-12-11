@@ -45,6 +45,7 @@ mybatis:
   mapper-locations: classpath:mapper/**/*.xml
   type-aliases-package: com.shiro.demo.entity
 
+
 shiro:
   #userNativeSessionManager: true
   #loginUrl: /login
@@ -58,4 +59,9 @@ elasticsearch:
   #apiKey: cF9SZWJvb0I4SFd3UW5EN3pwbEc6S1JKR2tXMGlSNktJTjVpSUU2YjdJUQ==
   apiKey: QU9XeGM0b0JTeC1nTlhnNVFLdjM6UXVKaWhPVHNTa21GT09SY05xNkVxdw==
 
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-not-delete-value: 0
 

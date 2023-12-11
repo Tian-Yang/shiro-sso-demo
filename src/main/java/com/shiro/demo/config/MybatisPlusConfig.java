@@ -2,9 +2,13 @@ package com.shiro.demo.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
+import com.shiro.demo.handler.BusinessDomainLineHandler;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -19,14 +23,6 @@ import javax.sql.DataSource;
 @Configuration
 public class MybatisPlusConfig {
 
-    /*
-        @Bean(name = "globalConfig")
-        public GlobalConfig globalConfig(@Qualifier("myBatisPlusMetaObjectHandler") MyBatisPlusMetaObjectHandler metaObjectHandler) {
-            GlobalConfig globalConfig = new GlobalConfig();
-            globalConfig.setMetaObjectHandler(metaObjectHandler);
-            return globalConfig;
-        }
-    */
     @Bean
     public DataSource dataSource(@Qualifier("jdbcConfig") JdbcConfig jdbcConfig) {
         DruidDataSource dataSource = new DruidDataSource();
@@ -44,15 +40,20 @@ public class MybatisPlusConfig {
         MybatisSqlSessionFactoryBean sqlSessionFactory = new MybatisSqlSessionFactoryBean();
         sqlSessionFactory.setDataSource(dataSource);
 
-
-        //添加分页功能================================================================================================
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        //添加租户功能
+        TenantLineInnerInterceptor tenantLineInnerInterceptor = new TenantLineInnerInterceptor();
+        tenantLineInnerInterceptor.setTenantLineHandler(new BusinessDomainLineHandler());
+        interceptor.addInnerInterceptor(tenantLineInnerInterceptor);
+        // 如果用了分页插件注意先 add TenantLineInnerInterceptor 再 add PaginationInnerInterceptor
+        //添加分页功能
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
 
         sqlSessionFactory.setPlugins(interceptor);
 
         return sqlSessionFactory.getObject();
     }
+
 
     @Bean
     @Primary
