@@ -144,6 +144,33 @@
             <version>32.1.3-jre</version>
         </dependency>
         <!--集成Google guava 本地缓存 end-->
+        <!--集成Swagger start-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-boot-starter</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+        <!--集成Swagger end-->
+        <!--集成验证码-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-captcha</artifactId>
+            <version>5.8.9</version>
+        </dependency>
+        <!---->
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
+        </dependency>
+        <!--集成中文转汉语拼音功能Start-->
+        <dependency>
+            <groupId>com.belerweb</groupId>
+            <artifactId>pinyin4j</artifactId>
+            <version>2.5.0</version>
+        </dependency>
+        <!--集成中文转汉语拼音功能End-->
     </dependencies>
 
     <build>

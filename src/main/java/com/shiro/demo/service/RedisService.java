@@ -75,16 +75,18 @@ public class RedisService {
         return redisTemplate.opsForValue().get(key);
     }
 
+    public boolean hasKey(String key){
+        return redisTemplate.hasKey(key);
+    }
+
+
+
     public void del(String key) {
         redisTemplate.opsForValue().getOperations().delete(key);
     }
 
     private Object deserializeObject(byte[] serializedObject) {
         return new GenericJackson2JsonRedisSerializer().deserialize(serializedObject);
-    }
-
-    public boolean hasKey(String key) {
-        return redisTemplate.opsForValue().getOperations().hasKey(key);
     }
 
 

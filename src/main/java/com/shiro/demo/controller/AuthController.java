@@ -1,28 +1,41 @@
 package com.shiro.demo.controller;
 
+import cn.hutool.captcha.CaptchaUtil;
+import cn.hutool.captcha.CircleCaptcha;
+import cn.hutool.captcha.generator.RandomGenerator;
+import cn.hutool.core.codec.Base64;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.IdUtil;
 import com.shiro.demo.annotations.UnAuth;
 import com.shiro.demo.bean.CommonResp;
 import com.shiro.demo.bean.TestReq;
 import com.shiro.demo.dto.AuthReqDto;
+import com.shiro.demo.enums.ErrorCodeEnum;
+import com.shiro.demo.exception.BusinessException;
 import com.shiro.demo.jwt.CsrfJwtTokenPayload;
 import com.shiro.demo.principal.JwtPrincipalMap;
+import com.shiro.demo.service.RedisService;
 import com.shiro.demo.util.JwtUtil;
+import com.shiro.demo.vo.login.GraphCaptchaVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.subject.Subject;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static com.shiro.demo.constants.CommonCOnstant.RANDOM_BASE_STRING;
+import static com.shiro.demo.constants.RedisKeyConstant.REDIS_GRAPH_CAPTCHA_KEY;
+
 @Slf4j
-@Controller
+@RestController
 public class AuthController {
+
+    @Resource
+    private RedisService redisService;
 
 
     //@RequiresRoles("admin")
@@ -69,8 +82,6 @@ public class AuthController {
     }
 
 
-
-
     @PostMapping("/login")
     @ResponseBody
     public CommonResp<String> login(HttpServletRequest request) {
@@ -82,8 +93,34 @@ public class AuthController {
             JwtPrincipalMap jwtPrincipalMap = (JwtPrincipalMap) currentUser.getPrincipals();
             token = jwtPrincipalMap.getJwtToken();
         }
-        log.info("userName:{},password:{}", userName);
+        log.info("userName:{}", userName);
         return CommonResp.success(token);
+    }
+
+    /**
+     * 获取验证码
+     *
+     * @param length
+     * @return
+     */
+    @UnAuth
+    @GetMapping("/obtain-graph-captcha")
+    public CommonResp<GraphCaptchaVO> genGraphCaptcha(@RequestParam(required = false, defaultValue = "4") int length) {
+
+        Assert.isTrue(length >= 4 && length <= 8,
+                () -> new BusinessException(ErrorCodeEnum.CODE_1001, "验证码长度应为 4 到 8 之间!"));
+
+        RandomGenerator randomGenerator = new RandomGenerator(RANDOM_BASE_STRING, length);
+        CircleCaptcha captcha = CaptchaUtil.createCircleCaptcha(98, 36, length, 10);
+        captcha.setGenerator(randomGenerator);
+        captcha.createCode();
+        String code = captcha.getCode();
+        log.debug("图形验证码: {}", code);
+        String uid = IdUtil.fastSimpleUUID();
+        redisService.set(REDIS_GRAPH_CAPTCHA_KEY + uid, code, 5 * 60 * 1000);
+        byte[] imageBytes = captcha.getImageBytes();
+        String base64Captcha = "data:image/png;base64," + Base64.encode(imageBytes);
+        return CommonResp.success(GraphCaptchaVO.builder().captcha(base64Captcha).uid(uid).build());
     }
 
     @PostMapping("/loginOut")

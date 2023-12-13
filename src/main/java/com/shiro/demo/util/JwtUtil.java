@@ -99,7 +99,7 @@ public class JwtUtil {
      * @Date 2023/11/15 14:49
      */
     public static Long getExpirationTimeMillis(int days) {
-        long expirationTimeMillis = System.currentTimeMillis() + 60 * days * 1000;
+        long expirationTimeMillis = System.currentTimeMillis() +  days * 86400*1000;
         return expirationTimeMillis;
     }
 
@@ -148,13 +148,5 @@ public class JwtUtil {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        System.out.println(Base64.getEncoder().encodeToString("yang".getBytes()));
-
-        System.out.println(System.currentTimeMillis());
-
-        System.out.println(JwtUtil.getExpirationTimeMillis(5));
-
-        System.out.println(JwtUtil.getExpirationTimeMillis(60));
     }
 }

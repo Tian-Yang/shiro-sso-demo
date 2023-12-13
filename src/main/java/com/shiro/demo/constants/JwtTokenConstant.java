@@ -11,7 +11,7 @@ public interface JwtTokenConstant {
     /**
      * Token有效天数
      */
-    int TOKEN_EXPIRED_DAYS = 60;
+    int TOKEN_EXPIRED_DAYS = 1;
 
     /**
      * principal唯一标识(认证用户唯一标识，例如用户名)

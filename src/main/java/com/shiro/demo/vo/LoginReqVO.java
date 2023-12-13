@@ -1,5 +1,5 @@
 package com.shiro.demo.vo;
 
-public class LoginReqVo {
+public class LoginReqVO {
     private String loginType;
 }

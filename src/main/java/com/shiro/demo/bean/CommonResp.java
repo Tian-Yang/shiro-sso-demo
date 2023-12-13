@@ -21,6 +21,8 @@ public class CommonResp<T> implements Serializable {
     private String code;
     private String errorMsg;
 
+    private String detailedException;
+
     public CommonResp(String code) {
         this.code = code;
     }
@@ -36,6 +38,18 @@ public class CommonResp<T> implements Serializable {
         this.errorMsg = errorMsg;
     }
 
+    public CommonResp(String code, String errorMsg, String detailedException) {
+        this.code = code;
+        this.errorMsg = errorMsg;
+        this.detailedException = detailedException;
+    }
+
+    public CommonResp(String code, String errorMsg, T body) {
+        this.code = code;
+        this.errorMsg = errorMsg;
+        this.body = body;
+    }
+
     public static CommonResp success() {
         return new CommonResp(RespCode.CODE_0000);
     }
@@ -46,5 +60,13 @@ public class CommonResp<T> implements Serializable {
 
     public static CommonResp fail(String code, String errorMSg) {
         return new CommonResp(code, errorMSg);
+    }
+
+    public static CommonResp fail(String code,String errorMsg,Object body){
+        return new CommonResp(code,errorMsg,body);
+    }
+
+    public static CommonResp fail(String code, String errorMSg, String detailedException) {
+        return new CommonResp(code, errorMSg, detailedException);
     }
 }

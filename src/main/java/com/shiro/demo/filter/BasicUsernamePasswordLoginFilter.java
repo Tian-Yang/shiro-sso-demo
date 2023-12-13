@@ -2,13 +2,19 @@ package com.shiro.demo.filter;
 
 import com.alibaba.fastjson.JSON;
 import com.shiro.demo.bean.CommonResp;
+import com.shiro.demo.util.ClearUtil;
+import com.shiro.demo.constants.RedisKeyConstant;
 import com.shiro.demo.constants.RespCode;
 import com.shiro.demo.context.AuthContext;
 import com.shiro.demo.entity.BusinessDomainHostEntity;
 import com.shiro.demo.entity.MemberInfoEntity;
+import com.shiro.demo.enums.ErrorCodeEnum;
+import com.shiro.demo.exception.BusinessException;
 import com.shiro.demo.service.BusinessDomainHostService;
 import com.shiro.demo.service.MemberInfoService;
+import com.shiro.demo.service.RedisService;
 import com.shiro.demo.token.UsernamePasswordBCryptToken;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.BasicHttpAuthenticationFilter;
@@ -31,6 +37,9 @@ public class BasicUsernamePasswordLoginFilter extends BasicHttpAuthenticationFil
 
     @Resource
     private MemberInfoService memberInfoService;
+
+    @Resource
+    private RedisService redisService;
 
     protected AuthenticationToken createToken(String username, String password,
                                               ServletRequest request, ServletResponse response) {
@@ -64,6 +73,29 @@ public class BasicUsernamePasswordLoginFilter extends BasicHttpAuthenticationFil
         return usernamePasswordBCryptToken;
     }
 
+
+    /**
+     * 扩展isAccessAllowed
+     *
+     * @param request     The current HTTP servlet request.
+     * @param response    The current HTTP servlet response.
+     * @param mappedValue The array of configured HTTP methods as strings. This is empty if no methods are configured.
+     * @return
+     */
+    @Override
+    protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
+        HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+        //增加图形验证码校验
+        String captcha = httpServletRequest.getHeader("captcha");
+        if (StringUtils.isBlank(captcha)) {
+            throw new BusinessException(ErrorCodeEnum.CODE_1002, "登录验证码不能为空");
+        }
+        if (!redisService.hasKey(RedisKeyConstant.REDIS_GRAPH_CAPTCHA_KEY + captcha)) {
+            throw new BusinessException(ErrorCodeEnum.CODE_1003, "验证码错误或已失效");
+        }
+        return super.isAccessAllowed(request, response, mappedValue);
+    }
+
     @Override
     protected boolean onLoginFailure(AuthenticationToken token, AuthenticationException e,
                                      ServletRequest request, ServletResponse response) {
@@ -77,8 +109,23 @@ public class BasicUsernamePasswordLoginFilter extends BasicHttpAuthenticationFil
         return false;
     }
 
+    /* @Override
+     public void afterCompletion(ServletRequest request, ServletResponse response, Exception exception) throws IOException {
+     }
+ */
+
+    /**
+     * 重写clearup方法对异常进行处理
+     *
+     * @param request  the incoming {@code ServletRequest}
+     * @param response the outgoing {@code ServletResponse}
+     * @param existing any exception that might have occurred while executing the {@code FilterChain} or
+     *                 pre or post advice, or {@code null} if the pre/chain/post execution did not throw an {@code Exception}.
+     * @throws IOException
+     */
     @Override
-    public void afterCompletion(ServletRequest request, ServletResponse response, Exception exception) {
-        AuthContext.clear();
+    protected void cleanup(ServletRequest request, ServletResponse response, Exception existing)
+            throws IOException {
+        ClearUtil.cleanup(response, existing);
     }
 }

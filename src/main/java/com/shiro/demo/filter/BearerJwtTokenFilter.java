@@ -3,6 +3,7 @@ package com.shiro.demo.filter;
 import com.alibaba.fastjson.JSON;
 import com.shiro.demo.annotations.UnAuth;
 import com.shiro.demo.bean.CommonResp;
+import com.shiro.demo.util.ClearUtil;
 import com.shiro.demo.constants.RespCode;
 import com.shiro.demo.context.HandlerMappingContext;
 import com.shiro.demo.token.BearerJwtToken;
@@ -20,7 +21,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,7 +49,7 @@ public class BearerJwtTokenFilter extends BearerHttpAuthenticationFilter {
     protected AuthenticationToken createBearerToken(String token, ServletRequest request) {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         String clientHost = httpServletRequest.getHeader("X-Forwarded-Host");
-        return new BearerJwtToken(token, httpServletRequest.getRemoteHost(),clientHost);
+        return new BearerJwtToken(token, httpServletRequest.getRemoteHost(), clientHost);
     }
 
 
@@ -82,9 +82,7 @@ public class BearerJwtTokenFilter extends BearerHttpAuthenticationFilter {
     protected void cleanup(ServletRequest request, ServletResponse response, Exception existing)
             throws ServletException, IOException {
         super.cleanup(request, response, existing);
-        if (null != existing) {
-            response.getWriter().write(JSON.toJSONString(CommonResp.fail(RespCode.CODE_401, existing.getMessage())));
-        }
+        ClearUtil.cleanup(response, existing);
     }
 
     /**
