@@ -16,9 +16,10 @@ public class CommonResp<T> implements Serializable {
      */
     public static final String CODE_401 = "401";
 
-    private T body;
+    private T data;
 
     private String code;
+
     private String errorMsg;
 
     private String detailedException;
@@ -29,7 +30,7 @@ public class CommonResp<T> implements Serializable {
 
     public CommonResp(String code, T body) {
         this.code = code;
-        this.body = body;
+        this.data = body;
     }
 
 
@@ -47,7 +48,7 @@ public class CommonResp<T> implements Serializable {
     public CommonResp(String code, String errorMsg, T body) {
         this.code = code;
         this.errorMsg = errorMsg;
-        this.body = body;
+        this.data = body;
     }
 
     public static CommonResp success() {

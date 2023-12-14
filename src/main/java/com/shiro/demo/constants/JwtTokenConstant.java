@@ -14,7 +14,7 @@ public interface JwtTokenConstant {
     int TOKEN_EXPIRED_DAYS = 1;
 
     /**
-     * principal唯一标识(认证用户唯一标识，例如用户名)
+     * principal唯一标识(认证用户唯一标识，memberId)
      */
     String PRIMARY_PRINCIPAL_KEY = "primary_principal_key";
 

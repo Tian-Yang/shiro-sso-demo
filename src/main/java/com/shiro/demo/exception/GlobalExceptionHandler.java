@@ -6,6 +6,7 @@ import com.shiro.demo.bean.CommonResp;
 import com.shiro.demo.config.DeserializerException;
 import com.shiro.demo.constants.RespCode;
 import com.shiro.demo.enums.ErrorCodeEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.checkerframework.checker.units.qual.C;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -22,6 +23,7 @@ import javax.servlet.ServletException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -34,6 +36,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     @ResponseBody
     public CommonResp businessException(BusinessException businessException) {
+        log.error("businessException:{}", businessException.getMessage());
         Integer code = businessException.getCode();
         String errorCode = null == code ? "9999" : String.valueOf(code);
         return CommonResp.fail(errorCode, businessException.getMessage());
@@ -43,6 +46,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public CommonResp handlerRuntimeException(Exception e) {
+        log.error("RuntimeException", e);
         return CommonResp.fail(RespCode.CODE_500, e.getMessage());
     }
 
@@ -74,6 +78,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ServletException.class)
     @ResponseBody
     public CommonResp handlerServletException(ServletException e) {
+        log.error("ServletException", e);
         return CommonResp.fail(RespCode.CODE_500, e.getMessage());
     }
 
@@ -81,6 +86,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseBody
     public CommonResp handlerUnauthorizedException(UnauthorizedException unauthorizedException) {
+        log.error("UnauthorizedException", unauthorizedException);
         return CommonResp.fail(RespCode.CODE_403, unauthorizedException.getMessage());
     }
 }

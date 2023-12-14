@@ -31,6 +31,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoEntityMapper, M
     public MemberInfoEntity queryByAccountName(String accountName) {
         LambdaQueryWrapper<MemberInfoEntity> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(MemberInfoEntity::getAccountName, accountName);
+        queryWrapper.eq(MemberInfoEntity::getBusinessDomainCode, AuthContext.getBusinessDomainCode());
         Long tenantId = AuthContext.getTenantId();
         if (null != tenantId) {
             queryWrapper.eq(MemberInfoEntity::getTenantId, tenantId);

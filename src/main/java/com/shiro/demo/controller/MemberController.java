@@ -1,9 +1,11 @@
 package com.shiro.demo.controller;
 
 import com.shiro.demo.bean.CommonResp;
+import com.shiro.demo.context.AuthContext;
 import com.shiro.demo.util.CharacterUtil;
 import com.shiro.demo.util.PasswordGenerator;
 import com.shiro.demo.vo.member.MemberNameGenerateVO;
+import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.pinyin4j.PinyinHelper;
 import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * Author TianYang
  * Date 2023/12/7 14:35
  */
+@Slf4j
 @RestController
 @RequestMapping("/member")
 public class MemberController {
@@ -60,6 +63,7 @@ public class MemberController {
      */
     @PostMapping("/generatePassword")
     public CommonResp<String> generatePassword(){
+        log.info("memberId:{}", AuthContext.getMemberId());
         return CommonResp.success(PasswordGenerator.generatePassword());
     }
 

@@ -1,5 +1,6 @@
 package com.shiro.demo.principal;
 
+import com.shiro.demo.bean.MemberInfo;
 import com.shiro.demo.constants.JwtTokenConstant;
 import org.apache.shiro.subject.SimplePrincipalMap;
 
@@ -36,5 +37,9 @@ public class JwtPrincipalMap extends SimplePrincipalMap {
     public String getErrorMsg() {
         Object error = super.ensureCombinedPrincipals().get(JwtTokenConstant.AUTH_ERROR_MESSAGE);
         return null == error ? "" : (String) error;
+    }
+
+    public MemberInfo getMemberInfo(){
+        return (MemberInfo) super.ensureCombinedPrincipals().get(JwtTokenConstant.MEMBER_INFO);
     }
 }

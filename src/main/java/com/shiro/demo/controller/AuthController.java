@@ -9,6 +9,7 @@ import cn.hutool.core.util.IdUtil;
 import com.shiro.demo.annotations.UnAuth;
 import com.shiro.demo.bean.CommonResp;
 import com.shiro.demo.bean.TestReq;
+import com.shiro.demo.context.AuthContext;
 import com.shiro.demo.dto.AuthReqDto;
 import com.shiro.demo.enums.ErrorCodeEnum;
 import com.shiro.demo.exception.BusinessException;

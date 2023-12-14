@@ -16,7 +16,9 @@ public enum ErrorCodeEnum {
     CODE_2007(2007, "菜单和目录的父节点只能为目录"),
 
     CODE_2008(2008, "按钮的父节点只能为菜单"),
-    CODE_2009(2009, "路径不能为空");
+    CODE_2009(2009, "路径不能为空"),
+    CODE_2010(2010, "菜单名称已存在"),
+    CODE_2011(2011, "菜单或目录的路径与按钮权限编码冲突");
 
     private int code;
     private String message;

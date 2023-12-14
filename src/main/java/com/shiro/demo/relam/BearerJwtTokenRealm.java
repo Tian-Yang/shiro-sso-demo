@@ -2,6 +2,7 @@ package com.shiro.demo.relam;
 
 import com.shiro.demo.bean.MemberInfo;
 import com.shiro.demo.constants.JwtTokenConstant;
+import com.shiro.demo.context.AuthContext;
 import com.shiro.demo.principal.JwtPrincipalMap;
 import com.shiro.demo.token.BearerJwtToken;
 import com.shiro.demo.util.JwtUtil;
@@ -67,6 +68,14 @@ public class BearerJwtTokenRealm extends CustomizeAbstractRealm {
             }
             //未失效则延长有效期
             else {
+                //初始化用户上下文
+                Long memberId = (Long) simplePrincipalMap.getPrimaryPrincipal();
+                MemberInfo memberInfo = simplePrincipalMap.getMemberInfo();
+                String businessDomainCode = memberInfo.getBusinessDomainCode();
+                Long tenantId = memberInfo.getTenantId();
+                AuthContext.setBusinessDomainCode(businessDomainCode);
+                AuthContext.setTenantId(tenantId);
+                AuthContext.setMemberId(memberId);
                 //延长JWT Token失效时间
                 simplePrincipalMap.put(JwtTokenConstant.TOKEN_EXPIRED_TIME, JwtUtil.getExpirationTimeMillis(60));
                 simpleAuthenticationInfo.setPrincipals(simplePrincipalMap);
@@ -83,7 +92,7 @@ public class BearerJwtTokenRealm extends CustomizeAbstractRealm {
 
     @Override
     protected void clearCachedAuthenticationInfo(PrincipalCollection principals) {
-       super.clearCachedAuthenticationInfo(principals);
+        super.clearCachedAuthenticationInfo(principals);
     }
 
 
@@ -112,7 +121,7 @@ public class BearerJwtTokenRealm extends CustomizeAbstractRealm {
     @Override
     protected Object getAuthorizationCacheKey(PrincipalCollection principals) {
         JwtPrincipalMap jwtPrincipalMap = (JwtPrincipalMap) principals;
-        MemberInfo memberInfo= jwtPrincipalMap.oneByType(MemberInfo.class);
+        MemberInfo memberInfo = jwtPrincipalMap.oneByType(MemberInfo.class);
         String key = memberInfo.getMemberAuthCacheKey() + "_authorization";
         return key;
     }

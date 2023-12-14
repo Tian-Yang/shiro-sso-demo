@@ -21,9 +21,9 @@
         <appender-ref ref="CONSOLE" />
         <appender-ref ref="FILE" />
     </root>
-    <!-- 根据日志级别设置日志输出 -->
+    <!-- 根据日志级别设置日志输出
     <root level="debug">
         <appender-ref ref="CONSOLE" />
-    </root>
+    </root>-->
 
 </configuration>

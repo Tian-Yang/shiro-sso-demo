@@ -14,7 +14,7 @@ import java.util.Date;
  */
 @TableName(value ="business_domain_host")
 @Data
-public class BusinessDomainHostEntity implements Serializable {
+public class BusinessDomainHostEntity extends BaseEntity implements Serializable {
     /**
      * 
      */
@@ -42,32 +42,11 @@ public class BusinessDomainHostEntity implements Serializable {
     /**
      * 
      */
-    private Long createBy;
-
-    /**
-     * 
-     */
-    private Date createTime;
-
-    /**
-     * 
-     */
-    private Long updateBy;
-
-    /**
-     * 
-     */
-    private Date updateTime;
-
-    /**
-     * 
-     */
     private Long delFlag;
 
     /**
      * 
      */
-    private Date dataTime;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -92,8 +71,7 @@ public class BusinessDomainHostEntity implements Serializable {
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getUpdateBy() == null ? other.getUpdateBy() == null : this.getUpdateBy().equals(other.getUpdateBy()))
             && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()))
-            && (this.getDelFlag() == null ? other.getDelFlag() == null : this.getDelFlag().equals(other.getDelFlag()))
-            && (this.getDataTime() == null ? other.getDataTime() == null : this.getDataTime().equals(other.getDataTime()));
+            && (this.getDelFlag() == null ? other.getDelFlag() == null : this.getDelFlag().equals(other.getDelFlag()));
     }
 
     @Override
@@ -109,7 +87,6 @@ public class BusinessDomainHostEntity implements Serializable {
         result = prime * result + ((getUpdateBy() == null) ? 0 : getUpdateBy().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
         result = prime * result + ((getDelFlag() == null) ? 0 : getDelFlag().hashCode());
-        result = prime * result + ((getDataTime() == null) ? 0 : getDataTime().hashCode());
         return result;
     }
 
@@ -128,7 +105,6 @@ public class BusinessDomainHostEntity implements Serializable {
         sb.append(", updateBy=").append(updateBy);
         sb.append(", updateTime=").append(updateTime);
         sb.append(", delFlag=").append(delFlag);
-        sb.append(", dataTime=").append(dataTime);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

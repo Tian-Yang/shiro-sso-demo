@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shiro.demo.mapper.MenuInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.shiro.demo.entity.MenuInfoEntity">
+            <id property="menuId" column="menu_id" jdbcType="BIGINT"/>
+            <result property="parentMenuId" column="parent_menu_id" jdbcType="BIGINT"/>
+            <result property="menuName" column="menu_name" jdbcType="VARCHAR"/>
+            <result property="menuType" column="menu_type" jdbcType="VARCHAR"/>
+            <result property="permission" column="permission" jdbcType="VARCHAR"/>
+            <result property="path" column="path" jdbcType="VARCHAR"/>
+            <result property="businessDomainCode" column="business_domain_code" jdbcType="VARCHAR"/>
+            <result property="appDomainCode" column="app_domain_code" jdbcType="BIGINT"/>
+            <result property="icon" column="icon" jdbcType="VARCHAR"/>
+            <result property="sort" column="sort" jdbcType="INTEGER"/>
+            <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="delFlag" column="del_flag" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <resultMap id="menuVOResultMap" type="com.shiro.demo.vo.menu.MenuVO">
+        <id property="menuId" column="menu_id"/>
+        <result property="parentMenuId" column="parent_menu_id"/>
+        <result property="menuName" column="menu_name"/>
+        <result property="level" column="level"/>
+        <result property="sort" column="sort"/>
+        <result property="menuType" column="menuType"/>
+        <result property="path" column="path"/>
+        <result property="icon" column="icon"/>
+    </resultMap>
+
+    <sql id="Base_Column_List" >
+        menu_id,parent_menu_id,menu_name,
+        menu_type,permission,path,
+        business_domain_code,app_domain_code,icon,
+        sort,create_by,create_time,
+        update_by,update_time,del_flag,
+        data_time
+    </sql>
+    <sql id="queryMenuList">
+        a.menu_id,
+        a.parent_menu_id,
+        a.menu_name,
+        a.menu_type,
+        a.permission,
+        a.path,
+        a.icon,
+        a.sort,
+        a.create_by,
+        a.create_time,
+        a.update_by,
+        a.update_time,
+        a.del_flag
+    </sql>
+    <select id="queryAccessibleMenus" resultMap="menuVOResultMap" >
+        Select
+            <include refid="queryMenuList"/>
+        from
+            menu_info a,
+            role_menu_info b,
+            member_role_info c,
+            member_info d
+        where
+            a.menu_id = b.menu_id
+            and b.role_id = c.role_id
+            and c.member_id = d.member_id
+            and d.member_id = #{membrerId}
+    </select>
+
+    <select id="queryAllMenus" resultType="com.shiro.demo.vo.menu.MenuVO">
+        select
+            <include refid="queryMenuList"/>
+        from
+            menu_info a
+        where
+            a.menu_position = #{menuPosition}
+    </select>
+
+    <select id="queryAccessibleMenusOfTenant" parameterType="com.shiro.demo.vo.menu.MenuQueryVO" >
+        Select
+        <include refid="queryMenuList"/>
+        from
+            menu_info a,
+            role_menu_info b,
+            member_role_info c,
+            member_info d,
+            tenant_menu_info e
+        where
+            a.menu_id = b.menu_id
+            and b.role_id = c.role_id
+            and c.member_id = d.member_id
+            and d.member_id = #{membrerId}
+            and a.menu_id = d.menu_id
+    </select>
+
+</mapper>

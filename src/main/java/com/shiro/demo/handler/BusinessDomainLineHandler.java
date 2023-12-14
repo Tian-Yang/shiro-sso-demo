@@ -3,6 +3,7 @@ package com.shiro.demo.handler;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.shiro.demo.context.AuthContext;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.schema.Column;
 
@@ -24,17 +25,26 @@ public class BusinessDomainLineHandler implements TenantLineHandler {
 
     @Override
     public Expression getTenantId() {
-        return new StringValue(AuthContext.getBusinessDomainCode());
+        LongValue tenantId = null;
+        Long tenantIdValue = AuthContext.getTenantId();
+        if (null != tenantIdValue) {
+            tenantId = new LongValue(tenantIdValue);
+        }
+        return tenantId;
     }
 
     @Override
     public String getTenantIdColumn() {
-        return "business_domain_code";
+        return "tenant_id";
     }
 
 
     @Override
     public boolean ignoreTable(String tableName) {
+
+        if (null == getTenantId()) {
+            return true;
+        }
         //可配置忽略表名
         return ignoreTables.contains(tableName);
     }

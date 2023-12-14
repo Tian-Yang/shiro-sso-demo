@@ -6,11 +6,26 @@ package com.shiro.demo.context;
  * Date 2023/12/9 21:06
  */
 public class AuthContext {
+
+    /**
+     * 业务域编码
+     */
     private static final ThreadLocal<String> businessDomainCodeThreadLocal = new ThreadLocal<>();
 
+    /**
+     * 系统域编码
+     */
     private static final ThreadLocal<String> appDomainCodeThreadLocal = new ThreadLocal<>();
 
+    /**
+     * 租户ID
+     */
     private static final ThreadLocal<Long> tenantIdThreadLocal = new ThreadLocal<Long>();
+
+    /**
+     * 会员ID
+     */
+    private static final ThreadLocal<Long> memberIdThreadLocal = new ThreadLocal<>();
 
 
     public static void setBusinessDomainCode(String businessDomainCode) {
@@ -37,8 +52,10 @@ public class AuthContext {
         appDomainCodeThreadLocal.remove();
     }
 
-    public static void setTenantId(long tenantId) {
-        tenantIdThreadLocal.set(tenantId);
+    public static void setTenantId(Long tenantId) {
+        if(null!=tenantId){
+            tenantIdThreadLocal.set(tenantId);
+        }
     }
 
     public static Long getTenantId() {
@@ -49,10 +66,23 @@ public class AuthContext {
         tenantIdThreadLocal.remove();
     }
 
+    public static void setMemberId(Long memberId) {
+        memberIdThreadLocal.set(memberId);
+    }
+
+    public static Long getMemberId() {
+        return memberIdThreadLocal.get();
+    }
+
+    public static void deleteMemberId() {
+        memberIdThreadLocal.remove();
+    }
+
     public static void clear() {
         deleteBusinessDomainCode();
         deleteAppDomainCode();
         deleteTenantId();
+        deleteMemberId();
     }
 
 }
