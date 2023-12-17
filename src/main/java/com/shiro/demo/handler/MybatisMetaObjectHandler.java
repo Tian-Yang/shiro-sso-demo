@@ -1,4 +1,4 @@
-package com.shiro.demo.config;
+package com.shiro.demo.handler;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.shiro.demo.context.AuthContext;

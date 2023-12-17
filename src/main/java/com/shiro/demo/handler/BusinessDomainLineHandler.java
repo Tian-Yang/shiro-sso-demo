@@ -21,6 +21,8 @@ public class BusinessDomainLineHandler implements TenantLineHandler {
 
     static {
         ignoreTables.add("business_domain_host");
+        ignoreTables.add("menu_info");
+
     }
 
     @Override

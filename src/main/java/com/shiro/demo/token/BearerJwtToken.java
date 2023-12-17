@@ -47,7 +47,7 @@ public class BearerJwtToken implements HostAuthenticationToken, RememberMeAuthen
         String bussinessDomainCode = memberInfo.getBusinessDomainCode();
         String key = bussinessDomainCode + "_" + memberId;
         if (null != tenantId) {
-            key = key + "_" + token;
+            key = key + "_" + tenantId;
         }
         return key;
     }

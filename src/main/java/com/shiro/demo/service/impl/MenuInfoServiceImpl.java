@@ -68,7 +68,7 @@ public class MenuInfoServiceImpl extends ServiceImpl<MenuInfoMapper, MenuInfoEnt
         //校验菜单名称是否存在
         checkMenuNameIsExists(menuName, null);
         //校验排序是否已存在
-        checkSortIsExists(menuType, level, sort, menuPosition, null);
+        checkSortIsExists(menuType, level, sort, parentMenuId, menuPosition, null);
         //校验路径
         checkPath(menuType, path, null);
         //校验权限编码
@@ -86,12 +86,30 @@ public class MenuInfoServiceImpl extends ServiceImpl<MenuInfoMapper, MenuInfoEnt
 
     @Override
     public List<MenuVO> queryAccessibleMenus(MenuQueryVO menuQueryVO) {
-        return null;
+        return this.baseMapper.queryAccessibleMenus(AuthContext.getMemberId(), getQueryMenuPosition(menuQueryVO), AuthContext.getBusinessDomainCode(), AuthContext.getTenantId());
     }
 
     @Override
     public List<MenuVO> queryAllMenus(MenuQueryVO menuQueryVO) {
-        return this.baseMapper.queryAllMenus(getQueryMenuPosition(menuQueryVO));
+        Long tenantId = AuthContext.getTenantId();
+        return this.baseMapper.queryAllMenus(getQueryMenuPosition(menuQueryVO), AuthContext.getBusinessDomainCode(), AuthContext.getTenantId());
+    }
+
+    @Override
+    public List<MenuInfoEntity> queryAllMenus() {
+        LambdaQueryWrapper<MenuInfoEntity> menuInfoEntityLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        menuInfoEntityLambdaQueryWrapper.eq(MenuInfoEntity::getBusinessDomainCode, AuthContext.getBusinessDomainCode());
+        return this.baseMapper.selectList(menuInfoEntityLambdaQueryWrapper);
+    }
+
+    @Override
+    public List<MenuVO> queryAllMenusByRoleId(Long roleId) {
+        return this.baseMapper.queryAllMenusByRoleId(roleId, AuthContext.getBusinessDomainCode(), AuthContext.getTenantId());
+    }
+
+    @Override
+    public void initTenantMenu(Long tenantId) {
+
     }
 
     private void checkParentMenu(MenuInfoEntity parentMenu, String menuType) {
@@ -125,12 +143,15 @@ public class MenuInfoServiceImpl extends ServiceImpl<MenuInfoMapper, MenuInfoEnt
         }
     }
 
-    private void checkSortIsExists(String menuType, Integer level, Integer sort, String menuPosition, Long menuId) {
+    private void checkSortIsExists(String menuType, Integer level, Integer sort, Long parentMenuId, String menuPosition, Long menuId) {
         LambdaQueryWrapper<MenuInfoEntity> queryWrapper = Wrappers.lambdaQuery();
         queryWrapper.eq(MenuInfoEntity::getMenuType, menuType);
         queryWrapper.eq(MenuInfoEntity::getLevel, level);
         queryWrapper.eq(MenuInfoEntity::getSort, sort);
         queryWrapper.eq(MenuInfoEntity::getMenuPosition, menuPosition);
+        if (null != parentMenuId) {
+            queryWrapper.eq(MenuInfoEntity::getParentMenuId, parentMenuId);
+        }
         queryWrapper.eq(MenuInfoEntity::getBusinessDomainCode, AuthContext.getBusinessDomainCode());
 
         MenuInfoEntity menuInfo = this.getBaseMapper().selectOne(queryWrapper);
@@ -164,9 +185,9 @@ public class MenuInfoServiceImpl extends ServiceImpl<MenuInfoMapper, MenuInfoEnt
         MenuInfoEntity menuInfo = this.getBaseMapper().selectOne(queryWrapper);
         if (checkIsExists(menuId, menuInfo)) {
             if (menuType.equals(MenuTypeEnum.BUTTON.getCode())) {
-                throw new BusinessException(ErrorCodeEnum.CODE_2005, "按钮权限编码已存在");
+                throw new BusinessException(ErrorCodeEnum.CODE_2006, "按钮权限编码已存在");
             } else {
-                throw new BusinessException(ErrorCodeEnum.CODE_2005, "按钮权限编码已存在");
+                throw new BusinessException(ErrorCodeEnum.CODE_2011, "菜单或目录的路径与按钮权限编码冲突");
             }
         }
 

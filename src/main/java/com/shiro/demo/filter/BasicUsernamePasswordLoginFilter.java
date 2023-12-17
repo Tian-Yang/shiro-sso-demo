@@ -1,7 +1,9 @@
 package com.shiro.demo.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.shiro.demo.bean.CommonResp;
+import com.shiro.demo.enums.MemberIdentityTypeEnum;
 import com.shiro.demo.util.ClearUtil;
 import com.shiro.demo.constants.RedisKeyConstant;
 import com.shiro.demo.constants.RespCode;
@@ -23,7 +25,11 @@ import javax.annotation.Resource;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 用户名密码认证过滤器
@@ -63,7 +69,14 @@ public class BasicUsernamePasswordLoginFilter extends BasicHttpAuthenticationFil
         //根据userName+租户ID从数据库回去对应的凭证
         MemberInfoEntity memberInfo = memberInfoService.queryByAccountName(username);
         if (null == memberInfo) {
-            throw new AuthenticationException(RespCode.CODE_1001);
+            throw new BusinessException(ErrorCodeEnum.CODE_1006, "用户名不存在");
+        }
+
+        String identityType = memberInfo.getIdentityType();
+        if (null == tenantId) {
+            if (!MemberIdentityTypeEnum.SAAS_SUPER_ADMIN.getCode().equals(identityType)) {
+                throw new BusinessException(ErrorCodeEnum.CODE_1005, "账号非当前业务域管理员账号，禁止登录");
+            }
         }
 
 
@@ -86,13 +99,32 @@ public class BasicUsernamePasswordLoginFilter extends BasicHttpAuthenticationFil
     protected boolean isAccessAllowed(ServletRequest request, ServletResponse response, Object mappedValue) {
         HttpServletRequest httpServletRequest = (HttpServletRequest) request;
         //增加图形验证码校验
-        String captcha = httpServletRequest.getHeader("captcha");
-        if (StringUtils.isBlank(captcha)) {
+        String captcha = StringUtils.EMPTY;
+        String uid = StringUtils.EMPTY;
+        captcha = httpServletRequest.getHeader("captcha");
+        uid = httpServletRequest.getHeader("uid");
+        /*try {
+            BufferedReader reader = httpServletRequest.getReader();
+            String requestBody = reader.lines().collect(Collectors.joining(System.lineSeparator()));
+            if(StringUtils.isNotBlank(requestBody)){
+                JSONObject jsonObject= JSON.parseObject(requestBody);
+                captcha=  jsonObject.getString("captcha");
+                uid = jsonObject.getString("uid");
+            }
+        } catch (IOException e) {
+            throw new BusinessException(ErrorCodeEnum.CODE_9999, "系统异常");
+        }*/
+        /*if (StringUtils.isBlank(captcha)) {
             throw new BusinessException(ErrorCodeEnum.CODE_1002, "登录验证码不能为空");
-        }
-        if (!redisService.hasKey(RedisKeyConstant.REDIS_GRAPH_CAPTCHA_KEY + captcha)) {
+        }*/
+        if (!redisService.hasKey(RedisKeyConstant.REDIS_GRAPH_CAPTCHA_KEY + uid)) {
             throw new BusinessException(ErrorCodeEnum.CODE_1003, "验证码错误或已失效");
         }
+      /*  String existsCaptcha = (String) redisService.get(RedisKeyConstant.REDIS_GRAPH_CAPTCHA_KEY + uid);
+        if (!captcha.equalsIgnoreCase(existsCaptcha)) {
+            throw new BusinessException(ErrorCodeEnum.CODE_1004, "验证码错误");
+
+        }*/
         return super.isAccessAllowed(request, response, mappedValue);
     }
 
@@ -101,7 +133,7 @@ public class BasicUsernamePasswordLoginFilter extends BasicHttpAuthenticationFil
                                      ServletRequest request, ServletResponse response) {
         if (null != e) {
             try {
-                response.getWriter().write(JSON.toJSONString(CommonResp.fail(RespCode.CODE_401, e.getMessage())));
+                response.getWriter().write(JSON.toJSONString(CommonResp.fail(Integer.parseInt(RespCode.CODE_401), e.getMessage())));
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

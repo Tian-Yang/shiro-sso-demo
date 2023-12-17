@@ -1,5 +1,6 @@
 package com.shiro.demo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -17,7 +18,7 @@ public class MemberInfoEntity extends BaseEntity implements Serializable {
     /**
      *
      */
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long memberId;
 
     /**
@@ -54,6 +55,11 @@ public class MemberInfoEntity extends BaseEntity implements Serializable {
      * 状态;0-禁用, 1-启用
      */
     private Integer status;
+
+    /**
+     * 修改密码次数
+     */
+    private Integer modifyPasswordNum;
 
     /**
      * 用户类型 saas_super_admin :saas超管 tenant_super_admin:租户超管 tenant_admin:租户管理员 tenant_user:租户内用户 unbound_identity:未绑定身份

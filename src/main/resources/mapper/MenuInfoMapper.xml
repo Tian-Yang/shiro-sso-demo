@@ -62,13 +62,21 @@
         from
             menu_info a,
             role_menu_info b,
-            member_role_info c,
+            member_role c,
             member_info d
-        where
-            a.menu_id = b.menu_id
+            <if test="tenantId!=null">
+                ,tenant_menu_info e
+            </if>
+            where  a.menu_id = b.menu_id
             and b.role_id = c.role_id
             and c.member_id = d.member_id
-            and d.member_id = #{membrerId}
+            and  a.menu_position = #{menuPosition}
+            and d.member_id = #{memberId}
+            <if test="tenantId!=null">
+                and a.menu_id = e.menu_id
+                and e.tenant_id = #{tenantId}
+                and e.business_domain_code = #{businessDomainCode}
+            </if>
     </select>
 
     <select id="queryAllMenus" resultType="com.shiro.demo.vo.menu.MenuVO">
@@ -76,11 +84,43 @@
             <include refid="queryMenuList"/>
         from
             menu_info a
+            <if test="tenantId!=null">
+                ,tenant_menu_info b
+            </if>
         where
             a.menu_position = #{menuPosition}
+            and a.business_domain_code = #{businessDomainCode}
+            <if test="tenantId!=null">
+                and a.menu_id = b.menu_id
+                and b.tenant_id = #{tenantId}
+                and b.business_domain_code = #{businessDomainCode}
+            </if>
     </select>
 
-    <select id="queryAccessibleMenusOfTenant" parameterType="com.shiro.demo.vo.menu.MenuQueryVO" >
+
+
+    <select id="queryAllMenusByRoleId" resultType="com.shiro.demo.vo.menu.MenuVO">
+        select
+        <include refid="queryMenuList"/>
+        from
+            menu_info a,
+            role_menu_info b
+            <if test="tenantId!=null">
+                ,tenant_menu_info c
+            </if>
+        where
+        b.role_id = #{roleId}
+        and a.menu_id = b.menu_id
+        and b.business_domain_code = #{businessDomainCode}
+        and a.business_domain_code = #{businessDomainCode}
+        <if test="tenantId!=null">
+            and a.menu_id = c.menu_id
+            and c.tenant_id = #{tenantId}
+            and c.business_domain_code = #{businessDomainCode}
+        </if>
+    </select>
+
+    <select id="queryAccessibleMenusOfTenant" parameterType="com.shiro.demo.vo.menu.MenuVO" >
         Select
         <include refid="queryMenuList"/>
         from
@@ -89,12 +129,20 @@
             member_role_info c,
             member_info d,
             tenant_menu_info e
+            <if test="tenantId!=null">
+                ,tenant_menu_info e
+            </if>
         where
             a.menu_id = b.menu_id
             and b.role_id = c.role_id
             and c.member_id = d.member_id
             and d.member_id = #{membrerId}
             and a.menu_id = d.menu_id
+            <if test="tenantId!=null">
+                and a.menu_id = e.menu_id
+                and e.tenant_id = #{tenantId}
+                and e.business_domain_code = #{businessDomainCode}
+            </if>
     </select>
 
 </mapper>

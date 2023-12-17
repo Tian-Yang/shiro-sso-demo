@@ -7,6 +7,7 @@ package com.shiro.demo.enums;
  */
 public enum MemberIdentityTypeEnum {
     SAAS_SUPER_ADMIN("saas_super_admin", "Saas超管"),
+    SAAS_AMIN("saas_admin", "Saas管理员"),
     TENANT_SUPER_ADMIN("tenant_super_admin", "租户超管"),
     TENANT_ADMIN("tenant_admin", "租户管理员"),
     TENANT_USER("tenant_user", "租户内用户"),

@@ -5,7 +5,7 @@ public interface RespCode {
     /**
      * 成功
      */
-    String CODE_0000 = "0000";
+    Integer CODE_0000 = 0;
 
     /**
      * 未认证

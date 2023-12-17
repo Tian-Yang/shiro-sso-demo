@@ -1,85 +1,51 @@
 package com.shiro.demo.config;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.mybatisplus.annotation.DbType;
-import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
-import com.baomidou.mybatisplus.core.config.GlobalConfig;
+import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties;
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.baomidou.mybatisplus.extension.spring.MybatisSqlSessionFactoryBean;
 import com.shiro.demo.handler.BusinessDomainLineHandler;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionTemplate;
+import com.shiro.demo.interceptor.MyTenantLineInnerInterceptor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
 
 @Configuration
 public class MybatisPlusConfig {
 
-    /*@Bean
-    public DataSource dataSource(@Qualifier("jdbcConfig") JdbcConfig jdbcConfig) {
-        DruidDataSource dataSource = new DruidDataSource();
-        dataSource.setUrl(jdbcConfig.getUrl());
-        dataSource.setUsername(jdbcConfig.getUsername());
-        dataSource.setPassword(jdbcConfig.getPassword());
-        dataSource.setDriverClassName(jdbcConfig.getDriverClassName());
-        dataSource.setDbType(DbType.MYSQL.getDb());
-        return dataSource;
-    }*/
-
-   /* @Bean
-    @Primary
-    public SqlSessionFactory sqlSessionFactory(@Qualifier("dataSource") DataSource dataSource) throws Exception {
-        MybatisSqlSessionFactoryBean sqlSessionFactory = new MybatisSqlSessionFactoryBean();
-        sqlSessionFactory.setDataSource(dataSource);
-        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        //添加租户功能
-        TenantLineInnerInterceptor tenantLineInnerInterceptor = new TenantLineInnerInterceptor();
-        tenantLineInnerInterceptor.setTenantLineHandler(new BusinessDomainLineHandler());
-        interceptor.addInnerInterceptor(tenantLineInnerInterceptor);
-        // 如果用了分页插件注意先 add TenantLineInnerInterceptor 再 add PaginationInnerInterceptor
-        //添加分页功能
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
-
-        sqlSessionFactory.setPlugins(interceptor);
-
-        return sqlSessionFactory.getObject();
-    }*/
 
     /**
-     * 整合分页插件
+     * MyBatis 插件整合
      * @return
      */
     @Bean
-    @InterceptorIgnore(tenantLine = "true")
-    public PaginationInnerInterceptor paginationInterceptor() {
-        PaginationInnerInterceptor interceptor = new PaginationInnerInterceptor();
-        // 设置分页插件的一些属性，如下为默认值
-        interceptor.setMaxLimit(500L); // 单页分页条数限制，默认 500 条，设置为 -1 不限制
-        interceptor.setOverflow(true); // 单页分页条数超过限制是否调整为默认分页条数，默认 false
-        interceptor.setDbType(DbType.MYSQL);
+    public MybatisPlusInterceptor mybatisPlusInterceptor(@Qualifier("businessDomainLineHandler")BusinessDomainLineHandler businessDomainLineHandler) {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor();
+        //添加租户插件
+        MyTenantLineInnerInterceptor tenantLineInnerInterceptor = new MyTenantLineInnerInterceptor();
+        tenantLineInnerInterceptor.setTenantLineHandler(businessDomainLineHandler);
+        interceptor.addInnerInterceptor(tenantLineInnerInterceptor);
+        //多个插件使用的情况，请将分页插件放到 插件执行链 最后面。如在租户插件前面，会出现 COUNT 执行 SQL 不准确问题
+        //添加分页插件
+        paginationInnerInterceptor.setMaxLimit(10L); // 单页分页条数限制，默认 10 条，设置为 -1 不限制
+        paginationInnerInterceptor.setOverflow(false); // 单页分页条数超过限制是否调整为默认分页条数，默认 false
+        paginationInnerInterceptor.setDbType(DbType.MYSQL);
+        interceptor.addInnerInterceptor(paginationInnerInterceptor);//如果配置多个插件,切记分页最后添加
         return interceptor;
     }
 
-    /**
-     * 整合多租户插件
-     * @return
-     */
+
     @Bean
     public BusinessDomainLineHandler businessDomainLineHandler(){
-        BusinessDomainLineHandler businessDomainLineHandler = new BusinessDomainLineHandler();
-        return businessDomainLineHandler;
+        return new BusinessDomainLineHandler();
     }
-
-
-
 
    /* @Bean
     @Primary

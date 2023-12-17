@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DeserializerException.class)
     @ResponseBody
     public CommonResp handeDeserializerException(DeserializerException deserializerException) {
-        return CommonResp.fail("9999", deserializerException.getMessage());
+        return CommonResp.fail(9999, deserializerException.getMessage());
     }
 
     @ExceptionHandler(BusinessException.class)
@@ -38,7 +38,7 @@ public class GlobalExceptionHandler {
     public CommonResp businessException(BusinessException businessException) {
         log.error("businessException:{}", businessException.getMessage());
         Integer code = businessException.getCode();
-        String errorCode = null == code ? "9999" : String.valueOf(code);
+        int errorCode = null == code ? 9999 : code;
         return CommonResp.fail(errorCode, businessException.getMessage());
     }
 
@@ -47,7 +47,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public CommonResp handlerRuntimeException(Exception e) {
         log.error("RuntimeException", e);
-        return CommonResp.fail(RespCode.CODE_500, e.getMessage());
+        return CommonResp.fail(500, e.getMessage());
     }
 
 
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
         if (CollectionUtil.isNotEmpty(msg)) {
             detail = CollectionUtil.join(msg, StrUtil.COMMA);
         }
-        return CommonResp.fail(String.valueOf(ErrorCodeEnum.CODE_9001.getCode()), "参数校验失败!" + detail, msg);
+        return CommonResp.fail(ErrorCodeEnum.CODE_9001.getCode(), "参数校验失败!" + detail, msg);
     }
 
     @ExceptionHandler({BindException.class})
@@ -72,14 +72,14 @@ public class GlobalExceptionHandler {
         if (CollectionUtil.isNotEmpty(msg)) {
             detail = CollectionUtil.join(msg, StrUtil.COMMA);
         }
-        return CommonResp.fail(String.valueOf(ErrorCodeEnum.CODE_9001.getCode()), "参数校验失败!" + detail, msg);
+        return CommonResp.fail(ErrorCodeEnum.CODE_9001.getCode(), "参数校验失败!" + detail, msg);
     }
 
     @ExceptionHandler(ServletException.class)
     @ResponseBody
     public CommonResp handlerServletException(ServletException e) {
         log.error("ServletException", e);
-        return CommonResp.fail(RespCode.CODE_500, e.getMessage());
+        return CommonResp.fail(500, e.getMessage());
     }
 
 
@@ -87,6 +87,6 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public CommonResp handlerUnauthorizedException(UnauthorizedException unauthorizedException) {
         log.error("UnauthorizedException", unauthorizedException);
-        return CommonResp.fail(RespCode.CODE_403, unauthorizedException.getMessage());
+        return CommonResp.fail(403, unauthorizedException.getMessage());
     }
 }

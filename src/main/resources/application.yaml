@@ -27,12 +27,12 @@ spring:
     username: tianyang
     password: Kawayi
     driver-class-name: com.mysql.cj.jdbc.Driver
-    type: com.alibaba.druid.pool.DruidDataSource
-    druid:
-      initial-size: 5
-      min-idle: 5
-      max-active: 20
-      max-wait: 60000
+    #type: com.alibaba.druid.pool.DruidDataSource
+    #druid:
+      #initial-size: 5
+      #min-idle: 5
+      #max-active: 20
+      #max-wait: 60000
   main:
     allow-bean-definition-overriding: true
   #redis连接配置
@@ -40,11 +40,6 @@ spring:
     host: 81.69.247.184
     port: 6379
     password: kawayi
-
-#mybatis:
-  #mapper-locations: classpath:mapper/**/*.xml
-  #type-aliases-package: com.shiro.demo.entity
-
 
 shiro:
   #userNativeSessionManager: true
@@ -66,4 +61,6 @@ mybatis-plus:
       logic-not-delete-value: 0
   mapper-locations:  classpath:mapper/**/*.xml
   type-aliases-package: com.shiro.demo.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 

@@ -40,8 +40,9 @@ public class MenuController {
      * @return
      */
     @PostMapping("/queryAccessibleMenus")
-    CommonResp<MenuVO> queryAccessibleMenus() {
-        return CommonResp.success();
+    CommonResp<MenuVO> queryAccessibleMenus(@Validated @RequestBody MenuQueryVO menuQueryVO) {
+       ;
+        return CommonResp.success( menuInfoService.queryAccessibleMenus(menuQueryVO));
     }
 
     /**

@@ -6,6 +6,6 @@ import javax.validation.constraints.Pattern;
 
 @Data
 public class MenuQueryVO {
-    @Pattern(regexp = "^(left|top|right|button)$", message = "未识别的菜单类型")
+    @Pattern(regexp = "^(left|top|right|button)$", message = "未识别的M菜单类型")
     private String menuPosition;
 }

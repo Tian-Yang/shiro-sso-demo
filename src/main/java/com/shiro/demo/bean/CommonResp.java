@@ -1,6 +1,7 @@
 package com.shiro.demo.bean;
 
 import com.shiro.demo.constants.RespCode;
+import com.shiro.demo.enums.ErrorCodeEnum;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,34 +19,34 @@ public class CommonResp<T> implements Serializable {
 
     private T data;
 
-    private String code;
+    private int code;
 
     private String errorMsg;
 
     private String detailedException;
 
-    public CommonResp(String code) {
+    public CommonResp(int code) {
         this.code = code;
     }
 
-    public CommonResp(String code, T body) {
+    public CommonResp(int code, T body) {
         this.code = code;
         this.data = body;
     }
 
 
-    public CommonResp(String code, String errorMsg) {
+    public CommonResp(int code, String errorMsg) {
         this.code = code;
         this.errorMsg = errorMsg;
     }
 
-    public CommonResp(String code, String errorMsg, String detailedException) {
-        this.code = code;
+    public CommonResp(ErrorCodeEnum code, String errorMsg, String detailedException) {
+        this.code = code.getCode();
         this.errorMsg = errorMsg;
         this.detailedException = detailedException;
     }
 
-    public CommonResp(String code, String errorMsg, T body) {
+    public CommonResp(int code, String errorMsg, T body) {
         this.code = code;
         this.errorMsg = errorMsg;
         this.data = body;
@@ -59,15 +60,15 @@ public class CommonResp<T> implements Serializable {
         return new CommonResp(RespCode.CODE_0000, body);
     }
 
-    public static CommonResp fail(String code, String errorMSg) {
+    public static CommonResp fail(int code, String errorMSg) {
         return new CommonResp(code, errorMSg);
     }
 
-    public static CommonResp fail(String code,String errorMsg,Object body){
+    public static CommonResp fail(int code,String errorMsg,Object body){
         return new CommonResp(code,errorMsg,body);
     }
 
-    public static CommonResp fail(String code, String errorMSg, String detailedException) {
+    public static CommonResp fail(ErrorCodeEnum code, String errorMSg, String detailedException) {
         return new CommonResp(code, errorMSg, detailedException);
     }
 }

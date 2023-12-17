@@ -14,7 +14,13 @@ import java.util.List;
  * @Entity generator.domain.MenuInfoEntity
  */
 public interface MenuInfoMapper extends BaseMapper<MenuInfoEntity> {
-    List<MenuVO> queryAllMenus(@Param("menuPosition") String menuPosition);
+    List<MenuVO> queryAllMenus(@Param("menuPosition") String menuPosition,@Param("businessDomainCode")String businessDomainCode,@Param("tenantId") Long tenantId);
+
+    List<MenuVO> queryAllMenusByRoleId(@Param("roleId") Long roleId,@Param("businessDomainCode")String businessDomainCode,@Param("tenantId") Long tenantId);
+
+    List<MenuVO> queryAccessibleMenus(@Param("memberId")Long memberId,@Param("menuPosition") String menuPosition,@Param("businessDomainCode")String businessDomainCode,@Param("tenantId") Long tenantId);
+
+
 }
 
 

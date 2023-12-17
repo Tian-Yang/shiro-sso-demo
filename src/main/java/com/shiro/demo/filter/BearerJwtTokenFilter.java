@@ -57,7 +57,7 @@ public class BearerJwtTokenFilter extends BearerHttpAuthenticationFilter {
                                      ServletRequest request, ServletResponse response) {
         if (null != e) {
             try {
-                response.getWriter().write(JSON.toJSONString(CommonResp.fail(RespCode.CODE_401, e.getMessage())));
+                response.getWriter().write(JSON.toJSONString(CommonResp.fail(Integer.parseInt(RespCode.CODE_401), e.getMessage())));
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }

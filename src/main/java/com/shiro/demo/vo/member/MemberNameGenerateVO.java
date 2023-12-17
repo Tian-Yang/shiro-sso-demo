@@ -4,10 +4,12 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.io.Serializable;
 
 @Data
-public class MemberNameGenerateVO {
+public class MemberNameGenerateVO implements Serializable {
 
+    private static final long serialVersionUID = 1676822194379249090L;
     /**
      * 中文名称
      */

@@ -3,10 +3,7 @@ package com.shiro.demo.vo.menu;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.*;
 import java.io.Serializable;
 
 @Data
@@ -18,7 +15,7 @@ public class MenuAddVO implements Serializable {
      * 菜单名称
      */
     @NotBlank(message = "菜单名称不能为空")
-    @Pattern(regexp = "^[\\u4e00-\\u9fa5a-zA-Z0-9]{1,30}$", message = "菜单名称只能输入中文、英文字母、数字，且最大长度30字符")
+    @Pattern(regexp = "^[\\u4e00-\\u9fa5a-zA-Z0-9_]{1,30}$", message = "菜单名称只能输入中文、英文字母、英文下划线,数字，且最大长度30字符")
     private String menuName;
 
     /**
@@ -71,6 +68,7 @@ public class MenuAddVO implements Serializable {
     /**
      * 权限编码(按钮类型专用)
      */
-    @Pattern(regexp = "^[a-zA-Z/-]*$", message = "权限编码只能输入英文字母、英文/和英文-")
+    @Pattern(regexp = "^[a-zA-Z/-_]*$", message = "权限编码只能输入英文字母、英文/和英文-、英文_")
+    @Size(max = 30, message = "权限编码长度不能超过30个字符")
     private String permission;
 }

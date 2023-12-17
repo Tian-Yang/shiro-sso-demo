@@ -6,6 +6,7 @@ import com.shiro.demo.vo.menu.MenuAddVO;
 import com.shiro.demo.vo.menu.MenuQueryVO;
 import com.shiro.demo.vo.menu.MenuVO;
 
+import javax.swing.text.html.parser.Entity;
 import java.util.List;
 
 /**
@@ -37,5 +38,15 @@ public interface MenuInfoService extends IService<MenuInfoEntity> {
      */
     List<MenuVO> queryAllMenus(MenuQueryVO menuQueryVO);
 
+    List<MenuInfoEntity> queryAllMenus();
+
+
+    List<MenuVO> queryAllMenusByRoleId(Long roleId);
+
+    /**
+     * 初始化租户菜单
+     * @param tenantId
+     */
+    void initTenantMenu(Long tenantId);
 
 }
