@@ -178,6 +178,7 @@ public class MemberInfoServiceImpl extends ServiceImpl<MemberInfoMapper, MemberI
                 roleMenuInfoEntity.setTenantId(tenantId);
                 roleMenuInfoEntity.setRoleId(roleId);
                 roleMenuInfoEntity.setMenuId(menuId);
+                roleMenuInfoEntity.setBusinessDomainCode(AuthContext.getBusinessDomainCode());
                 roleMenuList.add(roleMenuInfoEntity);
             }
             //新增租户菜单表
